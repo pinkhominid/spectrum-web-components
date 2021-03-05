@@ -56,6 +56,7 @@ export interface ThemeData {
     color?: Color;
     scale?: Scale;
     lang?: string;
+    dir?: 'ltr' | 'rtl';
 }
 
 type ThemeKindProvider = {
@@ -231,6 +232,7 @@ export class Theme extends HTMLElement implements ThemeKindProvider {
         const { detail: theme } = event;
         theme.color = this.color || undefined;
         theme.scale = this.scale || undefined;
+        theme.dir = (this.dir as 'ltr' | 'rtl') || undefined;
         theme.lang =
             this.lang || document.documentElement.lang || navigator.language;
     }
@@ -287,6 +289,10 @@ export class Theme extends HTMLElement implements ThemeKindProvider {
 
     public startManagingContentDirection(el: HTMLElement): void {
         this.trackedChildren.add(el);
+        el.setAttribute(
+            'dir',
+            this.dir === 'rtl' ? this.dir : this.dir || 'ltr'
+        );
     }
 
     public stopManagingContentDirection(el: HTMLElement): void {

@@ -87,19 +87,9 @@ const config = {
             complexSelectors: [
                 {
                     replacement:
-                        ":host([dir]) slot[icon-only]::slotted([slot='icon']), :host([dir]) slot[icon-only] sp-icon",
+                        ":host slot[icon-only]::slotted([slot='icon']), :host slot[icon-only] sp-icon",
                     selector:
                         '.spectrum-ActionButton .spectrum-Icon:only-child',
-                },
-                {
-                    replacement:
-                        ":host([dir=ltr]) slot:not([icon-only])::slotted([slot='icon']), :host([dir=ltr]) slot:not([icon-only]) sp-icon",
-                    selector: /\:host\(\[dir=ltr\]\) \.spectrum-Icon$/,
-                },
-                {
-                    replacement:
-                        ":host([dir=rtl]) slot:not([icon-only])::slotted([slot='icon']), :host([dir=rtl]) slot:not([icon-only]) sp-icon",
-                    selector: /\:host\(\[dir=rtl\]\) \.spectrum-Icon$/,
                 },
             ],
         },

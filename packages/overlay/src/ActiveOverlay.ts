@@ -18,10 +18,10 @@ import {
     TemplateResult,
 } from '@spectrum-web-components/base';
 import { ifDefined } from '@spectrum-web-components/base/src/directives.js';
-import { property } from '@spectrum-web-components/base/src/decorators.js';
+import { property, queryAsync } from '@spectrum-web-components/base/src/decorators.js';
 import { reparentChildren } from '@spectrum-web-components/shared';
 import { firstFocusableIn } from '@spectrum-web-components/shared/src/first-focusable-in.js';
-import { Color, Scale } from '@spectrum-web-components/theme';
+import { Theme, ThemeData } from '@spectrum-web-components/theme';
 import styles from './active-overlay.css.js';
 import {
     OverlayOpenCloseDetail,
@@ -149,13 +149,22 @@ export class ActiveOverlay extends SpectrumElement {
     @property({ reflect: true })
     public placement?: Placement;
     @property({ attribute: false })
-    public theme: {
-        color?: Color;
-        scale?: Scale;
-        lang?: string;
-    } = {};
+    public theme: ThemeData = {};
     @property({ attribute: false })
     public receivesFocus?: 'auto';
+
+    @queryAsync('sp-theme')
+    private themeEl!: Theme;
+
+    public ready = false;
+
+    public async startManagingContentDirection(el: HTMLElement): Promise<void> {
+        (await this.themeEl).startManagingContentDirection(el);
+    }
+
+    public async stopManagingContentDirection(el: HTMLElement): Promise<void> {
+        (await this.themeEl).stopManagingContentDirection(el);
+    }
 
     public tabbingAway = false;
     private originalPlacement?: Placement;
@@ -514,12 +523,13 @@ export class ActiveOverlay extends SpectrumElement {
     }
 
     public renderTheme(content: TemplateResult): TemplateResult {
-        const { color, scale, lang } = this.theme;
+        const { color, scale, lang, dir } = this.theme;
         return html`
             <sp-theme
                 color=${ifDefined(color)}
                 scale=${ifDefined(scale)}
                 lang=${ifDefined(lang)}
+                dir=${ifDefined(dir)}
                 part="theme"
             >
                 ${content}

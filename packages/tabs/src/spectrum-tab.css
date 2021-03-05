@@ -34,30 +34,60 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
         --spectrum-tabs-item-height
     ); /* .spectrum-Tabs-item .spectrum-Icon */
 }
+:host(:dir(ltr)) slot[name='icon'] + #item-label {
+    margin-left: calc(
+        var(--spectrum-tabs-icon-gap) - var(--spectrum-global-dimension-size-40)
+    ); /* [dir=ltr] .spectrum-Tabs-item .spectrum-Icon+.spectrum-Tabs-itemLabel */
+}
 :host([dir='ltr']) slot[name='icon'] + #item-label {
     margin-left: calc(
         var(--spectrum-tabs-icon-gap) - var(--spectrum-global-dimension-size-40)
     ); /* [dir=ltr] .spectrum-Tabs-item .spectrum-Icon+.spectrum-Tabs-itemLabel */
+}
+:host(:dir(rtl)) slot[name='icon'] + #item-label {
+    margin-right: calc(
+        var(--spectrum-tabs-icon-gap) - var(--spectrum-global-dimension-size-40)
+    ); /* [dir=rtl] .spectrum-Tabs-item .spectrum-Icon+.spectrum-Tabs-itemLabel */
 }
 :host([dir='rtl']) slot[name='icon'] + #item-label {
     margin-right: calc(
         var(--spectrum-tabs-icon-gap) - var(--spectrum-global-dimension-size-40)
     ); /* [dir=rtl] .spectrum-Tabs-item .spectrum-Icon+.spectrum-Tabs-itemLabel */
 }
+:host(:dir(ltr)):before {
+    left: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=ltr] .spectrum-Tabs-item:before */
+}
 :host([dir='ltr']):before {
     left: calc(
         var(--spectrum-tabs-focus-ring-padding-x) * -1
     ); /* [dir=ltr] .spectrum-Tabs-item:before */
+}
+:host(:dir(rtl)):before {
+    right: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=rtl] .spectrum-Tabs-item:before */
 }
 :host([dir='rtl']):before {
     right: calc(
         var(--spectrum-tabs-focus-ring-padding-x) * -1
     ); /* [dir=rtl] .spectrum-Tabs-item:before */
 }
+:host(:dir(ltr)):before {
+    right: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=ltr] .spectrum-Tabs-item:before */
+}
 :host([dir='ltr']):before {
     right: calc(
         var(--spectrum-tabs-focus-ring-padding-x) * -1
     ); /* [dir=ltr] .spectrum-Tabs-item:before */
+}
+:host(:dir(rtl)):before {
+    left: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=rtl] .spectrum-Tabs-item:before */
 }
 :host([dir='rtl']):before {
     left: calc(

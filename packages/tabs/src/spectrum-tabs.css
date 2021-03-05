@@ -349,28 +349,54 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
     vertical-align: top;
     z-index: 0;
 }
+:host(:dir(ltr)) ::slotted(:not([slot])):before {
+    left: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=ltr] .spectrum-Tabs-item:before */
+}
 :host([dir='ltr']) ::slotted(:not([slot])):before {
     left: calc(
         var(--spectrum-tabs-focus-ring-padding-x) * -1
     ); /* [dir=ltr] .spectrum-Tabs-item:before */
+}
+:host(:dir(rtl)) ::slotted(:not([slot])):before {
+    right: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=rtl] .spectrum-Tabs-item:before */
 }
 :host([dir='rtl']) ::slotted(:not([slot])):before {
     right: calc(
         var(--spectrum-tabs-focus-ring-padding-x) * -1
     ); /* [dir=rtl] .spectrum-Tabs-item:before */
 }
+:host(:dir(ltr)) ::slotted(:not([slot])):before {
+    right: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=ltr] .spectrum-Tabs-item:before */
+}
 :host([dir='ltr']) ::slotted(:not([slot])):before {
     right: calc(
         var(--spectrum-tabs-focus-ring-padding-x) * -1
     ); /* [dir=ltr] .spectrum-Tabs-item:before */
 }
+:host(:dir(rtl)) ::slotted(:not([slot])):before {
+    left: calc(
+        var(--spectrum-tabs-focus-ring-padding-x) * -1
+    ); /* [dir=rtl] .spectrum-Tabs-item:before */
+}
 :host([dir='rtl']) ::slotted(:not([slot])):before {
     left: calc(
         var(--spectrum-tabs-focus-ring-padding-x) * -1
     ); /* [dir=rtl] .spectrum-Tabs-item:before */
+}
+:host(:dir(ltr)) #selection-indicator {
+    left: 0; /* [dir=ltr] .spectrum-Tabs-selectionIndicator */
 }
 :host([dir='ltr']) #selection-indicator {
     left: 0; /* [dir=ltr] .spectrum-Tabs-selectionIndicator */
+}
+:host(:dir(rtl)) #selection-indicator {
+    right: 0; /* [dir=rtl] .spectrum-Tabs-selectionIndicator */
 }
 :host([dir='rtl']) #selection-indicator {
     right: 0; /* [dir=rtl] .spectrum-Tabs-selectionIndicator */
@@ -396,11 +422,23 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
 :host([direction^='horizontal']) ::slotted(:not([slot])) {
     vertical-align: top; /* .spectrum-Tabs--horizontal .spectrum-Tabs-item */
 }
+:host(:dir(ltr)[direction^='horizontal'])
+    ::slotted(:not([slot]):not(:first-child)) {
+    margin-left: var(
+        --spectrum-tabs-item-gap
+    ); /* [dir=ltr] .spectrum-Tabs--horizontal .spectrum-Tabs-item+*:not(.spectrum-Tabs-selectionIndicator) */
+}
 :host([dir='ltr'][direction^='horizontal'])
     ::slotted(:not([slot]):not(:first-child)) {
     margin-left: var(
         --spectrum-tabs-item-gap
     ); /* [dir=ltr] .spectrum-Tabs--horizontal .spectrum-Tabs-item+*:not(.spectrum-Tabs-selectionIndicator) */
+}
+:host(:dir(rtl)[direction^='horizontal'])
+    ::slotted(:not([slot]):not(:first-child)) {
+    margin-right: var(
+        --spectrum-tabs-item-gap
+    ); /* [dir=rtl] .spectrum-Tabs--horizontal .spectrum-Tabs-item+*:not(.spectrum-Tabs-selectionIndicator) */
 }
 :host([dir='rtl'][direction^='horizontal'])
     ::slotted(:not([slot]):not(:first-child)) {
@@ -422,8 +460,14 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
 :host([quiet]) #list {
     display: inline-flex; /* .spectrum-Tabs--quiet */
 }
+:host(:dir(ltr)[direction^='vertical']) #list {
+    border-left: var(--spectrum-tabs-vertical-divider-size) solid; /* [dir=ltr] .spectrum-Tabs--vertical */
+}
 :host([dir='ltr'][direction^='vertical']) #list {
     border-left: var(--spectrum-tabs-vertical-divider-size) solid; /* [dir=ltr] .spectrum-Tabs--vertical */
+}
+:host(:dir(rtl)[direction^='vertical']) #list {
+    border-right: var(--spectrum-tabs-vertical-divider-size) solid; /* [dir=rtl] .spectrum-Tabs--vertical */
 }
 :host([dir='rtl'][direction^='vertical']) #list {
     border-right: var(--spectrum-tabs-vertical-divider-size) solid; /* [dir=rtl] .spectrum-Tabs--vertical */
@@ -433,11 +477,23 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
     flex-direction: column;
     padding: 0;
 }
+:host(:dir(ltr)[direction^='vertical']) ::slotted(:not([slot])) {
+    margin-left: calc(
+        var(--spectrum-tabs-vertical-item-margin-left) -
+            var(--spectrum-tabs-focus-ring-padding-x)
+    ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-item */
+}
 :host([dir='ltr'][direction^='vertical']) ::slotted(:not([slot])) {
     margin-left: calc(
         var(--spectrum-tabs-vertical-item-margin-left) -
             var(--spectrum-tabs-focus-ring-padding-x)
     ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-item */
+}
+:host(:dir(rtl)[direction^='vertical']) ::slotted(:not([slot])) {
+    margin-right: calc(
+        var(--spectrum-tabs-vertical-item-margin-left) -
+            var(--spectrum-tabs-focus-ring-padding-x)
+    ); /* [dir=rtl] .spectrum-Tabs--vertical .spectrum-Tabs-item */
 }
 :host([dir='rtl'][direction^='vertical']) ::slotted(:not([slot])) {
     margin-right: calc(
@@ -456,20 +512,40 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
     padding-right: var(--spectrum-tabs-focus-ring-padding-x);
     padding-top: 0;
 }
+:host(:dir(ltr)[direction^='vertical']) ::slotted(:not([slot])):before {
+    left: calc(
+        var(--spectrum-tabs-focus-ring-size) * -1
+    ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-item:before */
+}
 :host([dir='ltr'][direction^='vertical']) ::slotted(:not([slot])):before {
     left: calc(
         var(--spectrum-tabs-focus-ring-size) * -1
     ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-item:before */
+}
+:host(:dir(rtl)[direction^='vertical']) ::slotted(:not([slot])):before {
+    right: calc(
+        var(--spectrum-tabs-focus-ring-size) * -1
+    ); /* [dir=rtl] .spectrum-Tabs--vertical .spectrum-Tabs-item:before */
 }
 :host([dir='rtl'][direction^='vertical']) ::slotted(:not([slot])):before {
     right: calc(
         var(--spectrum-tabs-focus-ring-size) * -1
     ); /* [dir=rtl] .spectrum-Tabs--vertical .spectrum-Tabs-item:before */
 }
+:host(:dir(ltr)[direction^='vertical']) ::slotted(:not([slot])):before {
+    right: calc(
+        var(--spectrum-tabs-focus-ring-size) * -1
+    ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-item:before */
+}
 :host([dir='ltr'][direction^='vertical']) ::slotted(:not([slot])):before {
     right: calc(
         var(--spectrum-tabs-focus-ring-size) * -1
     ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-item:before */
+}
+:host(:dir(rtl)[direction^='vertical']) ::slotted(:not([slot])):before {
+    left: calc(
+        var(--spectrum-tabs-focus-ring-size) * -1
+    ); /* [dir=rtl] .spectrum-Tabs--vertical .spectrum-Tabs-item:before */
 }
 :host([dir='rtl'][direction^='vertical']) ::slotted(:not([slot])):before {
     left: calc(
@@ -494,16 +570,32 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
     line-height: var(--spectrum-tabs-compact-vertical-item-height);
     margin-bottom: var(--spectrum-tabs-compact-vertical-item-gap);
 }
+:host(:dir(ltr)[direction^='vertical']) #selection-indicator {
+    left: 0; /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-selectionIndicator */
+}
 :host([dir='ltr'][direction^='vertical']) #selection-indicator {
     left: 0; /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-selectionIndicator */
 }
+:host(:dir(rtl)[direction^='vertical']) #selection-indicator {
+    right: 0; /* [dir=rtl] .spectrum-Tabs--vertical .spectrum-Tabs-selectionIndicator */
+}
 :host([dir='rtl'][direction^='vertical']) #selection-indicator {
     right: 0; /* [dir=rtl] .spectrum-Tabs--vertical .spectrum-Tabs-selectionIndicator */
+}
+:host(:dir(ltr)[direction^='vertical']) #selection-indicator {
+    left: calc(
+        var(--spectrum-tabs-vertical-divider-size) * -1
+    ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-selectionIndicator */
 }
 :host([dir='ltr'][direction^='vertical']) #selection-indicator {
     left: calc(
         var(--spectrum-tabs-vertical-divider-size) * -1
     ); /* [dir=ltr] .spectrum-Tabs--vertical .spectrum-Tabs-selectionIndicator */
+}
+:host(:dir(rtl)[direction^='vertical']) #selection-indicator {
+    right: calc(
+        var(--spectrum-tabs-vertical-divider-size) * -1
+    ); /* [dir=rtl] .spectrum-Tabs--vertical .spectrum-Tabs-selectionIndicator */
 }
 :host([dir='rtl'][direction^='vertical']) #selection-indicator {
     right: calc(
@@ -520,11 +612,23 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
         var(--spectrum-alias-border-color-light)
     ); /* .spectrum-Tabs */
 }
+:host(:dir(ltr)[direction^='vertical']) #list {
+    border-left-color: var(
+        --spectrum-tabs-m-vertical-divider-color,
+        var(--spectrum-alias-border-color-light)
+    ); /* [dir=ltr] .spectrum-Tabs--vertical */
+}
 :host([dir='ltr'][direction^='vertical']) #list {
     border-left-color: var(
         --spectrum-tabs-m-vertical-divider-color,
         var(--spectrum-alias-border-color-light)
     ); /* [dir=ltr] .spectrum-Tabs--vertical */
+}
+:host(:dir(rtl)[direction^='vertical']) #list {
+    border-right-color: var(
+        --spectrum-tabs-m-vertical-divider-color,
+        var(--spectrum-alias-border-color-light)
+    ); /* [dir=rtl] .spectrum-Tabs--vertical */
 }
 :host([dir='rtl'][direction^='vertical']) #list {
     border-right-color: var(
@@ -550,6 +654,15 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
         var(--spectrum-global-color-gray-900)
     ); /* .spectrum-Tabs--quiet .spectrum-Tabs-selectionIndicator */
 }
+:host(:dir(ltr)[direction^='vertical'][compact]) #list,
+:host(:dir(ltr)[direction^='vertical'][quiet]) #list {
+    border-left-color: var(
+        --spectrum-tabs-m-vertical-quiet-divider-color,
+        var(--spectrum-alias-border-color-transparent)
+    ); /* [dir=ltr] .spectrum-Tabs--vertical.spectrum-Tabs--quiet,
+   * [dir=ltr] 
+  .spectrum-Tabs--vertical.spectrum-Tabs--compact */
+}
 :host([dir='ltr'][direction^='vertical'][compact]) #list,
 :host([dir='ltr'][direction^='vertical'][quiet]) #list {
     border-left-color: var(
@@ -557,6 +670,15 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
         var(--spectrum-alias-border-color-transparent)
     ); /* [dir=ltr] .spectrum-Tabs--vertical.spectrum-Tabs--quiet,
    * [dir=ltr] 
+  .spectrum-Tabs--vertical.spectrum-Tabs--compact */
+}
+:host(:dir(rtl)[direction^='vertical'][compact]) #list,
+:host(:dir(rtl)[direction^='vertical'][quiet]) #list {
+    border-right-color: var(
+        --spectrum-tabs-m-vertical-quiet-divider-color,
+        var(--spectrum-alias-border-color-transparent)
+    ); /* [dir=rtl] .spectrum-Tabs--vertical.spectrum-Tabs--quiet,
+   * [dir=rtl] 
   .spectrum-Tabs--vertical.spectrum-Tabs--compact */
 }
 :host([dir='rtl'][direction^='vertical'][compact]) #list,

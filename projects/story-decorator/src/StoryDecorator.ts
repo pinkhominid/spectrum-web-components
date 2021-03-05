@@ -71,7 +71,7 @@ const reduceMotionProperties = css`
 ActiveOverlay.prototype.renderTheme = function (
     content: TemplateResult
 ): TemplateResult {
-    const { color, scale, lang } = this.theme;
+    const { color, scale, lang, dir } = this.theme;
     return html`
         ${window.__swc_hack_knobs__.defaultReduceMotion
             ? html`
@@ -86,6 +86,7 @@ ActiveOverlay.prototype.renderTheme = function (
             color=${ifDefined(color)}
             scale=${ifDefined(scale)}
             lang=${ifDefined(lang)}
+            dir=${ifDefined(dir)}
             part="theme"
         >
             ${content}
