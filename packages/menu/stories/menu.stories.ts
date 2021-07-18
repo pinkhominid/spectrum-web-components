@@ -13,12 +13,14 @@ import { html, TemplateResult } from '@spectrum-web-components/base';
 
 import '../sp-menu.js';
 import '@spectrum-web-components/popover/sp-popover.js';
+import '@spectrum-web-components/action-menu/sp-action-menu.js';
 import '@spectrum-web-components/menu/sp-menu.js';
 import '@spectrum-web-components/menu/sp-menu-item.js';
 import '@spectrum-web-components/menu/sp-menu-divider.js';
 import '@spectrum-web-components/menu/sp-menu-group.js';
 import '@spectrum-web-components/icon/sp-icon.js';
 import '@spectrum-web-components/icons-workflow/icons/sp-icon-checkmark-circle.js';
+import '@spectrum-web-components/icons-workflow/icons/sp-icon-show-menu.js';
 
 export default {
     component: 'sp-menu',
@@ -197,6 +199,51 @@ export const MenuGroupSelects = (): TemplateResult => {
                 </sp-menu-group>
             </sp-menu>
         </sp-popover>
+    `;
+};
+
+export const submenu = (): TemplateResult => {
+    return html`
+        <sp-action-menu>
+            <sp-icon-show-menu slot="icon"></sp-icon-show-menu>
+            <sp-menu-group
+                @change=${() => console.log('group change')}
+                role="none"
+            >
+                <span slot="header">New York</span>
+                <sp-menu-item>Bronx</sp-menu-item>
+                <sp-menu-item>
+                    Brooklyn
+                    <sp-menu slot="sub-menu">
+                        <sp-menu-item>
+                            Ft. Greene
+                            <sp-menu slot="sub-menu">
+                                <sp-menu-item>S. Oxford St</sp-menu-item>
+                                <sp-menu-item>S. Portland Ave</sp-menu-item>
+                                <sp-menu-item>S. Elliot Pl</sp-menu-item>
+                            </sp-menu>
+                        </sp-menu-item>
+                        <sp-menu-item disabled>Park Slope</sp-menu-item>
+                        <sp-menu-item>Williamsburg</sp-menu-item>
+                    </sp-menu>
+                </sp-menu-item>
+                <sp-menu-item>
+                    Manhattan
+                    <sp-menu slot="sub-menu">
+                        <sp-menu-item disabled>SoHo</sp-menu-item>
+                        <sp-menu-item>
+                            Union Square
+                            <sp-menu slot="sub-menu">
+                                <sp-menu-item>14th St</sp-menu-item>
+                                <sp-menu-item>Broadway</sp-menu-item>
+                                <sp-menu-item>Park Ave</sp-menu-item>
+                            </sp-menu>
+                        </sp-menu-item>
+                        <sp-menu-item>Upper East Side</sp-menu-item>
+                    </sp-menu>
+                </sp-menu-item>
+            </sp-menu-group>
+        </sp-action-menu>
     `;
 };
 

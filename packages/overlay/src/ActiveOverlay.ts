@@ -203,9 +203,12 @@ export class ActiveOverlay extends SpectrumElement {
         this.tabIndex = -1;
         const parentOverlay = parentOverlayOf(this.trigger);
         const parentIsModal = parentOverlay && parentOverlay.slot === 'open';
+        if (parentIsModal) {
+            this._modalRoot = parentOverlay._modalRoot || parentOverlay;
+        }
         // If an overlay it triggered from within a "modal" overlay, it needs to continue
         // to act like one to get treated correctly in regards to tab trapping.
-        if (this.interaction === 'modal' || parentIsModal || this._modalRoot) {
+        if (this.interaction === 'modal' || this._modalRoot) {
             this.slot = 'open';
             if (this.interaction === 'modal') {
                 this.setAttribute('aria-modal', 'true');
