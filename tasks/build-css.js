@@ -38,7 +38,7 @@ export const processCSS = async (cssPath) => {
 };
 
 const buildCSS = async () => {
-    for await (const cssPath of globby.stream(`./packages/*/src/*.css`)) {
+    for await (const cssPath of globby.stream(`./packages/*/src/**/*.css`)) {
         processCSS(cssPath);
     }
 };

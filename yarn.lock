@@ -4188,6 +4188,11 @@
   resolved "https://registry.yarnpkg.com/@spectrum-css/dropzone/-/dropzone-3.0.11.tgz#55831c3e1cd79863fa7569a5064560187eccc63d"
   integrity sha512-RJDfE634Z7sByl2zkWTdm1rjZ1g1y7B3N085fSUrUIYttLEKZr0boMXV51bgwCT8zeJcYTZ4o1Uv63bcGeo0jw==
 
+"@spectrum-css/expressvars@1.0.0-beta.19":
+  version "1.0.0-beta.19"
+  resolved "https://registry.yarnpkg.com/@spectrum-css/expressvars/-/expressvars-1.0.0-beta.19.tgz#548e9d63218dc06ea68e798e295889a429886fb6"
+  integrity sha512-LDR7O2G3554ka5cqgfw44iJQW4ji9Mzupb8Ql7zxQh7efHPjiSOuKpAl8VVd8sNt6kwh1ZgbuFt9F5o4CamFtw==
+
 "@spectrum-css/fieldgroup@^3.0.10":
   version "3.0.10"
   resolved "https://registry.yarnpkg.com/@spectrum-css/fieldgroup/-/fieldgroup-3.0.10.tgz#6d9daf426f57ceecd21c57f469d18d1c164ae9fd"

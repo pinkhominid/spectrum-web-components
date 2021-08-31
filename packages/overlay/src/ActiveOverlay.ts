@@ -21,7 +21,7 @@ import { ifDefined } from '@spectrum-web-components/base/src/directives.js';
 import { property } from '@spectrum-web-components/base/src/decorators.js';
 import { reparentChildren } from '@spectrum-web-components/shared';
 import { firstFocusableIn } from '@spectrum-web-components/shared/src/first-focusable-in.js';
-import { Color, Scale } from '@spectrum-web-components/theme';
+import { Color, Flavor, Scale } from '@spectrum-web-components/theme';
 import styles from './active-overlay.css.js';
 import {
     OverlayOpenCloseDetail,
@@ -163,6 +163,7 @@ export class ActiveOverlay extends SpectrumElement {
         color?: Color;
         scale?: Scale;
         lang?: string;
+        theme?: Flavor;
     } = {};
     @property({ attribute: false })
     public receivesFocus?: 'auto';
@@ -487,9 +488,10 @@ export class ActiveOverlay extends SpectrumElement {
     }
 
     public renderTheme(content: TemplateResult): TemplateResult {
-        const { color, scale, lang } = this.theme;
+        const { color, scale, lang, theme } = this.theme;
         return html`
             <sp-theme
+                theme=${ifDefined(theme)}
                 color=${ifDefined(color)}
                 scale=${ifDefined(scale)}
                 lang=${ifDefined(lang)}

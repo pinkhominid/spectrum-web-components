@@ -18,8 +18,10 @@ export const packages = fs
     .readdirSync('packages')
     .filter((dir) => fs.statSync(`packages/${dir}`).isDirectory());
 
-const vrtHTML = ({ color, scale, dir, reduceMotion }) => (testFramework) =>
-    `<!doctype html>
+const vrtHTML =
+    ({ flavor, color, scale, dir, reduceMotion }) =>
+    (testFramework) =>
+        `<!doctype html>
     <html dir=${dir}>
         <head>
             <link rel="preconnect" href="https://use.typekit.net" />
@@ -38,6 +40,7 @@ const vrtHTML = ({ color, scale, dir, reduceMotion }) => (testFramework) =>
         <body>
         <script>
             window.__swc_hack_knobs__ = {
+                defaultFlavor: "${flavor || ''}",
                 defaultColor: "${color || ''}",
                 defaultScale: "${scale || ''}",
                 defaultDirection: "${dir || ''}",
@@ -49,24 +52,28 @@ const vrtHTML = ({ color, scale, dir, reduceMotion }) => (testFramework) =>
     </html>`;
 
 export let vrtGroups = [];
+const flavors = ['classic', 'express'];
 const colors = ['lightest', 'light', 'dark', 'darkest'];
 const scales = ['medium', 'large'];
 const directions = ['ltr', 'rtl'];
-colors.forEach((color) => {
-    scales.forEach((scale) => {
-        directions.forEach((dir) => {
-            const reduceMotion = true;
-            const testHTML = vrtHTML({
-                color,
-                scale,
-                dir,
-                reduceMotion,
-            });
-            vrtGroups.push({
-                name: `vrt-${color}-${scale}-${dir}`,
-                files: 'packages/*/test/*.test-vrt.js',
-                testRunnerHtml: testHTML,
-                browsers: [playwrightLauncher({ product: 'chromium' })],
+flavors.forEach((flavor) => {
+    colors.forEach((color) => {
+        scales.forEach((scale) => {
+            directions.forEach((dir) => {
+                const reduceMotion = true;
+                const testHTML = vrtHTML({
+                    flavor,
+                    color,
+                    scale,
+                    dir,
+                    reduceMotion,
+                });
+                vrtGroups.push({
+                    name: `vrt-${flavor}-${color}-${scale}-${dir}`,
+                    files: 'packages/*/test/*.test-vrt.js',
+                    testRunnerHtml: testHTML,
+                    browsers: [playwrightLauncher({ product: 'chromium' })],
+                });
             });
         });
     });
