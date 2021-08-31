@@ -12,10 +12,7 @@ governing permissions and limitations under the License.
 THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
 :host {
     --spectrum-colorloupe-width-adjusted: calc(
-        var(
-                --spectrum-colorloupe-width,
-                var(--spectrum-global-dimension-static-size-600)
-            ) +
+        var(--spectrum-colorloupe-width, var(--spectrum-alias-colorloupe-width)) +
             var(
                 --spectrum-colorhandle-inner-border-size,
                 var(--spectrum-global-dimension-static-size-25)
@@ -24,7 +21,7 @@ THIS FILE IS MACHINE GENERATED. DO NOT EDIT */
     --spectrum-colorloupe-height-adjusted: calc(
         var(
                 --spectrum-colorloupe-height,
-                var(--spectrum-global-dimension-static-size-800)
+                var(--spectrum-alias-colorloupe-height)
             ) +
             var(
                 --spectrum-colorhandle-inner-border-size,

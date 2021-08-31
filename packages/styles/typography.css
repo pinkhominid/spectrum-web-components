@@ -22,7 +22,8 @@ governing permissions and limitations under the License.
         var(--spectrum-global-dimension-font-size-100)
     );
 }
-.spectrum:lang(ar) {
+:root,
+:host:lang(ar) {
     font-family: var(
         --spectrum-alias-font-family-ar,
         var(--spectrum-global-font-font-family-ar)

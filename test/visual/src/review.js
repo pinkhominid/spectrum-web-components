@@ -44,7 +44,7 @@ function buildNavigation(tests, metadata) {
                 ></sp-sidenav-item>
             </sp-sidenav-heading>
             <sp-sidenav-item multilevel label="Other VRT Results">
-                ${metadata.themes.map(
+                ${metadata.vrts.map(
                     (theme) => html`
                         <sp-sidenav-item
                             label=${theme[0]}
