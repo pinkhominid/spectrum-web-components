@@ -9,42 +9,14 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-import fs from 'fs';
+import fs, { cp } from 'fs';
 import fg from 'fast-glob';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import crypto from 'crypto';
 
-const { commit, theme, branch } = yargs(hideBin(process.argv)).argv;
-
-const themes = [];
-// const themes = ['Classic', 'Express']; // prepping for Spectrum Express
-const scales = ['Medium', 'Large'];
-const colors = ['Lightest', 'Light', 'Dark', 'Darkest'];
-const directions = ['LTR', 'RTL'];
-// themes.map((theme) =>
-colors.map((color) =>
-    scales.map((scale) =>
-        directions.map((direction) => {
-            // const context = `-${theme.toLocaleLowerCase()}-${color.toLocaleLowerCase()}-${scale.toLocaleLowerCase()}-${direction.toLocaleLowerCase()}`;
-            const context = `${branch}-${color.toLocaleLowerCase()}-${scale.toLocaleLowerCase()}-${direction.toLocaleLowerCase()}`;
-            const md5 = crypto.createHash('md5');
-            md5.update(context);
-            const hash = md5.digest('hex');
-            themes.push([
-                `${color} | ${scale} | ${direction}`,
-                `https://${hash}--spectrum-web-components.netlify.app/review/`,
-            ]);
-            // themes.push([
-            //     `${theme} | ${color} | ${scale} | ${direction}`,
-            //     `https://${hash}--spectrum-web-components.netlify.app/review/`
-            // ]);
-        })
-    )
-);
-// );
+const { commit, branch } = yargs(hideBin(process.argv)).argv;
 
 function cleanURL(url) {
     return url.replace('test/visual/', '../');
@@ -54,9 +26,12 @@ function cleanID(url, type) {
     return url.replace(`test/visual/${type ? `${type}/` : ''}`, '');
 }
 
-async function main() {
+async function buildTestsForTheme(color, scale, dir) {
     const allTests = [];
-    for (const path of await fg(`test/visual/screenshots-baseline/**/*.png`)) {
+    const pathParts = `${color}/${scale}/${dir}`.toLowerCase();
+    for (const path of await fg(
+        `test/visual/screenshots-baseline/*/${pathParts}/**/*.png`
+    )) {
         const pathParts = path.split('/');
         const name = pathParts[pathParts.length - 1];
         const baseline = cleanURL(path);
@@ -70,7 +45,7 @@ async function main() {
         allTests.push(test);
     }
     for (const path of await fg(
-        `test/visual/screenshots-actual/updates/**/*.png`
+        `test/visual/screenshots-actual/updates/*/${pathParts}/**/*.png`
     )) {
         const pathParts = path.split('/');
         const name = pathParts[pathParts.length - 1];
@@ -91,7 +66,7 @@ async function main() {
         }
     }
     for (const path of await fg(
-        `test/visual/screenshots-actual/diff/**/*.png`
+        `test/visual/screenshots-actual/diff/*/${pathParts}/**/*.png`
     )) {
         const pathParts = path.split('/');
         const name = pathParts[pathParts.length - 1];
@@ -161,6 +136,45 @@ async function main() {
     tests.updated = tests.updated.reduce(testGroupReducer, {});
     tests.new = tests.new.reduce(testGroupReducer, {});
     tests.removed = tests.removed.reduce(testGroupReducer, {});
+    return {
+        color,
+        scale,
+        dir,
+        tests,
+    };
+}
+
+async function buildTestsForThemes() {
+    const testsForThemes = {};
+    const themeTests = [];
+    const themes = [];
+    // const themes = ['Classic', 'Express']; // prepping for Spectrum Express
+    const scales = ['Medium', 'Large'];
+    const colors = ['Lightest', 'Light', 'Dark', 'Darkest'];
+    const directions = ['LTR', 'RTL'];
+    // themes.map((theme) =>
+    colors.map((color) =>
+        scales.map((scale) =>
+            directions.map((direction) => {
+                testsForThemes[color] = testsForThemes[color] || {};
+                testsForThemes[color][scale] =
+                    testsForThemes[color][scale] || {};
+                testsForThemes[color][scale][direction] =
+                    testsForThemes[color][scale][direction] || {};
+                themeTests.push(buildTestsForTheme(color, scale, direction));
+            })
+        )
+    );
+    // );
+    const results = await Promise.all(themeTests);
+    results.forEach(({ color, scale, dir, tests }) => {
+        testsForThemes[color][scale][dir] = tests;
+    });
+    return testsForThemes;
+}
+
+async function main() {
+    const tests = await buildTestsForThemes();
     if (!fs.existsSync('test/visual/review')) {
         fs.mkdirSync('test/visual/review');
     }
@@ -168,8 +182,6 @@ async function main() {
         meta: {
             branch,
             commit,
-            theme,
-            themes,
         },
         tests,
     });

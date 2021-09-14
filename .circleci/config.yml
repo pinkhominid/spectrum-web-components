@@ -40,11 +40,10 @@ commands:
                   keys:
                       - v2-golden-images-<< pipeline.parameters.current_golden_images_hash >>-<< parameters.regression_color >>-<< parameters.regression_scale >>-<< parameters.regression_dir >>-
                       - v2-golden-images-main-<< parameters.regression_color >>-<< parameters.regression_scale >>-<< parameters.regression_dir >>-
-            - run:
-                  name: Count baseline images
-                  command: find test/visual/screenshots-baseline -type f | wc -l > count_start.txt
             - run: |
-                  yarn test:ci --config web-test-runner.config.vrt.js --group vrt-<< parameters.regression_color >>-<< parameters.regression_scale >>-<< parameters.regression_dir >>
+                  yarn test:build
+                  TEST=$(circleci tests glob packages/*/test/*.test-vrt.js | circleci tests split --split-by=timings)
+                  yarn test:start --files $TEST --config web-test-runner.config.vrt.js --group vrt-<< parameters.regression_color >>-<< parameters.regression_scale >>-<< parameters.regression_dir >>-ci
             # store results and artifacts before rearranging things for the new cache.
             - store_test_results:
                   path: /root/project/results/
@@ -66,23 +65,23 @@ commands:
                       echo hash
                       yarn netlify deploy --alias=$hash --dir=test/visual
             # move "updated" screenshot into the baseline directory before making the new cache
+            - persist_to_workspace:
+                  root: /
+                  paths:
+                      - root/project/test/visual/screenshots-actual
             - run:
                   when: always
                   command: |
                       rm -rf test/visual/screenshots-baseline
                       cp -R test/visual/screenshots-actual/updates test/visual/screenshots-baseline
-            - run:
-                  when: on_success
-                  name: Count current images
-                  command: find test/visual/screenshots-baseline -type f | wc -l > count_end.txt
             # prevent removing regression tests without requiring a new golden cache
-            - run:
-                  when: on_success
-                  name: Fail if there are a different number of images...
-                  command: |
-                      echo $(cat count_start.txt)
-                      echo $(cat count_end.txt)
-                      if [[ $(cat count_start.txt) -eq $(cat count_end.txt) ]]; then exit 0; else exit 1; fi
+            # - run:
+            #       when: on_success
+            #       name: Fail if there are a different number of images...
+            #       command: |
+            #           echo $(cat count_start.txt)
+            #           echo $(cat count_end.txt)
+            #           if [[ $(cat count_start.txt) -eq $(cat count_end.txt) ]]; then exit 0; else exit 1; fi
             - save_cache:
                   when: on_fail
                   name: Build Golden Images Revision Cache
@@ -98,7 +97,6 @@ commands:
 jobs:
     commitlint:
         executor: node
-
         steps:
             - checkout
             - restore_cache:
@@ -106,7 +104,7 @@ jobs:
                       - v3a-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
             - run:
                   name: Installing Dependencies
-                  command: yarn --ignore-scripts --frozen-lockfile --cache-folder ~/.cache/yarn
+                  command: yarn install --ignore-scripts --frozen-lockfile --cache-folder ~/.cache/yarn
             - save_cache:
                   paths:
                       - ~/.cache/yarn
@@ -122,16 +120,25 @@ jobs:
 
     test:
         executor: node
-
+        parallelism: 6
         steps:
             - downstream
+            - save_cache:
+                  paths:
+                      - packages
+                      - projects
+                      - tools
+                  key: v3a-build-{{ arch }}-{{ checksum "yarn.lock" }}
             - run:
                   name: Lint
                   command: yarn lint
             - run: yarn analyze
             - run:
                   name: Run tests
-                  command: yarn test:ci --config web-test-runner.config.ci.js --group unit --coverage
+                  command: |
+                      yarn test:build
+                      TEST=$(circleci tests glob packages/*/test/*.test.js | circleci tests split --split-by=timings)
+                      yarn test:start --files $TEST --config web-test-runner.config.ci.js --group unit-ci
             - store_test_results:
                   path: /root/project/results/
             - store_artifacts:
@@ -155,6 +162,7 @@ jobs:
                   yarn netlify deploy --alias=$branch
     visual:
         executor: node
+        parallelism: 6
         parameters:
             color:
                 type: string
@@ -168,6 +176,67 @@ jobs:
                   regression_color: << parameters.color >>
                   regression_scale: << parameters.scale >>
                   regression_dir: << parameters.dir >>
+
+    visual-publish:
+        executor: node
+        steps:
+            - checkout
+            - restore_cache:
+                  keys:
+                      - v3a-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
+            - run:
+                  name: Installing Dependencies
+                  command: yarn install --ignore-scripts --frozen-lockfile --cache-folder ~/.cache/yarn
+            - restore_cache:
+                  name: Restore build cache
+                  keys:
+                      - v3a-build-{{ arch }}-{{ checksum "yarn.lock" }}
+            - restore_cache:
+                  name: Restore Golden Images Cache
+                  keys:
+                      - v2-golden-images-<< pipeline.parameters.current_golden_images_hash >>-all-
+                      - v2-golden-images-main-all-
+                      - v2-golden-images-test-parallelism-all-
+            - attach_workspace:
+                  at: /
+            - run:
+                  name: Count baseline images
+                  command: find test/visual/screenshots-baseline -type f -name *.png | wc -l > count_start.txt
+            - run:
+                  name: Count baseline images
+                  command: find test/visual/screenshots-actual/updates -type f -name *.png | wc -l > count_end.txt
+            # prevent removing regression tests without requiring a new golden cache
+            - run:
+                  name: Fail if there are a different number of images...
+                  command: |
+                      echo $(cat count_start.txt)
+                      echo $(cat count_end.txt)
+                      if [[ $(cat count_start.txt) -eq $(cat count_end.txt) ]]; then exit 0; else exit 1; fi
+            - save_cache:
+                  when: on_fail
+                  name: Build Golden Images Revision Cache
+                  paths:
+                      - test/visual/screenshots-baseline
+                  key: v2-golden-images-{{ .Revision }}-all-{{ epoch }}
+            - save_cache:
+                  name: Build Golden Images Branch Cache
+                  paths:
+                      - test/visual/screenshots-baseline
+                  key: v2-golden-images-{{ .Branch }}-all-{{ epoch }}
+            - run:
+                  name: Create review site
+                  command: |
+                      branch=$(git symbolic-ref --short HEAD)
+                      node test/visual/review.js --branch=$branch --commit=<< pipeline.git.revision >>
+                      yarn rollup -c test/visual/rollup.config.js
+            - run:
+                  name: Publish review site
+                  command: |
+                      cp projects/documentation/content/favicon.ico test/visual
+                      branch=$(git symbolic-ref --short HEAD)
+                      hash=$(echo -n $branch | md5sum | cut -c 1-32)
+                      echo hash
+                      yarn netlify deploy --alias=$hash --dir=test/visual
 
     docs-publish:
         executor: node
@@ -190,6 +259,9 @@ workflows:
         jobs:
             - test
             - docs-preview
+            - visual-publish:
+                  requires:
+                      - visual
             - visual:
                   name: visual-<< matrix.color >>-<< matrix.scale >>-<< matrix.dir >>
                   matrix:

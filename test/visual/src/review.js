@@ -14,19 +14,88 @@ import '@spectrum-web-components/sidenav/sp-sidenav.js';
 import '@spectrum-web-components/sidenav/sp-sidenav-item.js';
 import '@spectrum-web-components/sidenav/sp-sidenav-heading.js';
 import '@spectrum-web-components/vrt-compare/vrt-compare.js';
-import { html, render, nothing } from 'lit-html';
+import { html, nothing, render } from 'lit-html';
 
 const review = document.querySelector('vrt-compare');
-const resultTypes = ['new', 'updated', 'removed', 'passed'];
+// const resultTypes = ['new', 'updated', 'removed', 'passed'];
+
+function renderResult(test, group) {
+    return html`
+        <sp-sidenav-item
+            @click=${() => placeTest(test)}
+            label=${test.name}
+            value=${test.name}
+            href="#${group}/${test.name}"
+        ></sp-sidenav-item>
+    `;
+}
+
+function renderResultsGroup(tests, themeName, resultsByType) {
+    const groups = Object.keys(tests).sort();
+    if (!tests || !groups.length) return nothing;
+    return html`
+        <sp-sidenav-heading label=${themeName}>
+            ${groups.map((group) => {
+                return html`
+                    <sp-sidenav-item
+                        label="${group} (${resultsByType[group]})"
+                        value=${group}
+                    >
+                        ${Object.keys(tests[group]).map((groupName) => {
+                            const groupTests = tests[group][groupName];
+                            return groupTests.map((test) => {
+                                if (Array.isArray(test)) {
+                                    return renderResultsGroup(
+                                        test,
+                                        resultType,
+                                        resultsByType
+                                    );
+                                }
+                                return renderResult(test, group);
+                            });
+                        })}
+                    </sp-sidenav-item>
+                `;
+            })}
+        </sp-sidenav-heading>
+    `;
+}
+
+function renderResults(tests) {
+    const results = [];
+    const themes = [];
+    // const themes = ['Classic', 'Express']; // prepping for Spectrum Express
+    const scales = ['Medium', 'Large'];
+    const colors = ['Lightest', 'Light', 'Dark', 'Darkest'];
+    const directions = ['LTR', 'RTL'];
+    // themes.map((theme) =>
+    colors.map((color) =>
+        scales.map((scale) =>
+            directions.map((direction) => {
+                const theme = tests[color][scale][direction];
+                const themeName = `${color} | ${scale} | ${direction}`;
+                const resultTypes = Object.keys(theme);
+                const resultsByType = resultTypes.reduce((acc, type) => {
+                    acc[type] = Object.keys(theme[type]).reduce(
+                        (acc, group) => {
+                            return acc + theme[type][group].length;
+                        },
+                        0
+                    );
+                    return acc;
+                }, {});
+                results.push(
+                    renderResultsGroup(theme, themeName, resultsByType)
+                );
+            })
+        )
+    );
+    // );
+    return results;
+}
 
 function buildNavigation(tests, metadata) {
     const sidenav = document.querySelector('sp-sidenav');
-    const resultsByType = resultTypes.reduce((acc, type) => {
-        acc[type] = Object.keys(tests[type]).reduce((acc, group) => {
-            return acc + tests[type][group].length;
-        }, 0);
-        return acc;
-    }, {});
     render(
         html`
             <sp-sidenav-heading label="Results for">
@@ -35,67 +104,11 @@ function buildNavigation(tests, metadata) {
                     style="user-select: all"
                 ></sp-sidenav-item>
                 <sp-sidenav-item
-                    label=${metadata.theme}
-                    style="user-select: all"
-                ></sp-sidenav-item>
-                <sp-sidenav-item
                     label=${metadata.commit}
                     style="user-select: all"
                 ></sp-sidenav-item>
             </sp-sidenav-heading>
-            <sp-sidenav-item multilevel label="Other VRT Results">
-                ${metadata.themes.map(
-                    (theme) => html`
-                        <sp-sidenav-item
-                            label=${theme[0]}
-                            href=${theme[1]}
-                        ></sp-sidenav-item>
-                    `
-                )}
-            </sp-sidenav-item>
-            ${resultTypes.map((resultType) => {
-                const groups = Object.keys(tests[resultType]).sort();
-                return html`
-                    ${tests[resultType] && groups.length
-                        ? html`
-                              <sp-sidenav-heading label=${resultType}>
-                                  <sp-sidenav-item
-                                      label="${resultsByType[
-                                          resultType
-                                      ]} screenshots"
-                                      ?expanded=${resultType !== 'passed'}
-                                      multiLevel
-                                  >
-                                      ${groups.map((group) => {
-                                          return html`
-                                              <sp-sidenav-item
-                                                  label=${group}
-                                                  value=${group}
-                                              >
-                                                  ${tests[resultType][
-                                                      group
-                                                  ].map((test) => {
-                                                      return html`
-                                                          <sp-sidenav-item
-                                                              @click=${() =>
-                                                                  placeTest(
-                                                                      test
-                                                                  )}
-                                                              label=${test.name}
-                                                              value=${test.name}
-                                                              href="#${group}/${test.name}"
-                                                          ></sp-sidenav-item>
-                                                      `;
-                                                  })}
-                                              </sp-sidenav-item>
-                                          `;
-                                      })}
-                                  </sp-sidenav-item>
-                              </sp-sidenav-heading>
-                          `
-                        : nothing}
-                `;
-            })}
+            ${renderResults(tests)}
         `,
         sidenav
     );
@@ -115,23 +128,23 @@ function buildNavigation(tests, metadata) {
             return;
         }
     }
-    if (Object.keys(tests.new).length) {
-        const key = Object.keys(tests.new)[0];
-        sidenav.value = tests.new[key][0].name;
-        placeTest(tests.new[key][0]);
-    } else if (Object.keys(tests.updated).length) {
-        const key = Object.keys(tests.updated)[0];
-        sidenav.value = tests.updated[key][0].name;
-        placeTest(tests.updated[key][0]);
-    } else if (Object.keys(tests.removed).length) {
-        const key = Object.keys(tests.removed)[0];
-        sidenav.value = tests.removed[key][0].name;
-        placeTest(tests.removed[key][0]);
-    } else if (Object.keys(tests.passed).length) {
-        const key = Object.keys(tests.passed)[0];
-        sidenav.value = tests.passed[key][0].name;
-        placeTest(tests.passed[key][0]);
-    }
+    // if (Object.keys(tests.new).length) {
+    //     const key = Object.keys(tests.new)[0];
+    //     sidenav.value = tests.new[key][0].name;
+    //     placeTest(tests.new[key][0]);
+    // } else if (Object.keys(tests.updated).length) {
+    //     const key = Object.keys(tests.updated)[0];
+    //     sidenav.value = tests.updated[key][0].name;
+    //     placeTest(tests.updated[key][0]);
+    // } else if (Object.keys(tests.removed).length) {
+    //     const key = Object.keys(tests.removed)[0];
+    //     sidenav.value = tests.removed[key][0].name;
+    //     placeTest(tests.removed[key][0]);
+    // } else if (Object.keys(tests.passed).length) {
+    //     const key = Object.keys(tests.passed)[0];
+    //     sidenav.value = tests.passed[key][0].name;
+    //     placeTest(tests.passed[key][0]);
+    // }
 }
 
 function placeTest(test) {
@@ -161,10 +174,6 @@ function placeTest(test) {
 async function run() {
     const response = await fetch('./data.json');
     const data = await response.json();
-    const decorator = document.querySelector('sp-story-decorator');
-    const theme = data.meta.theme.split(' ');
-    decorator.color = theme[0];
-    decorator.scale = theme[1];
     buildNavigation(data.tests, data.meta);
 }
 

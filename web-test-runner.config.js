@@ -94,6 +94,9 @@ export default {
             }
             return acc;
         }, []),
+        {
+            name: 'unit-ci',
+        },
     ],
     group: 'unit',
     browsers: [
