@@ -20,6 +20,10 @@ textarea {
     resize: inherit;
 }
 
+.input {
+    border-width: var(--swc-textfield-border-width);
+}
+
 :host([grows]) .input {
     position: absolute;
     top: 0;

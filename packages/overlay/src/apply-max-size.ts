@@ -20,13 +20,14 @@ export const applyMaxSize: Modifier<'applyMaxSize', Record<string, unknown>> = {
     phase: 'beforeWrite',
     requires: ['maxSize'],
     fn({ state }: ModifierArguments<Record<string, unknown>>): void {
-        const { height: maxHeight } = state.modifiersData.maxSize;
+        const { height: maxAvailableHeight } = state.modifiersData.maxSize;
         if (!appliedSizeDefaults.has(state.elements.popper)) {
             appliedSizeDefaults.set(
                 state.elements.popper,
                 state.rects.popper.height
             );
         }
+        const maxHeight = maxAvailableHeight - 8 - 6; // Spectrum specification: https://spectrum.adobe.com/page/popover/#Container-padding
         const actualHeight = appliedSizeDefaults.get(state.elements.popper);
         const constrainHeight = maxHeight < actualHeight;
         const appliedHeight = constrainHeight ? `${maxHeight}px` : '';

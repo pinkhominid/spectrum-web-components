@@ -37,6 +37,7 @@ export default {
         a11ySnapshotPlugin(),
         configuredVisualRegressionPlugin(),
         json({}),
+        setViewportPlugin(),
     ],
     mimeTypes: {
         '**/*.json': 'js',
