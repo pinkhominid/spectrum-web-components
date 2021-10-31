@@ -33,6 +33,16 @@ import {
 } from '@spectrum-web-components/color-handle';
 import { TinyColor } from '@ctrl/tinycolor';
 
+export type ColorChannel =
+    | 'hue'
+    | 'saturation'
+    | 'brightness'
+    | 'lightness'
+    | 'red'
+    | 'green'
+    | 'blue'
+    | 'alpha';
+
 /**
  * @element sp-color-slider
  * @slot gradient - a custom gradient visually outlining the available color values
@@ -41,6 +51,9 @@ export class ColorSlider extends Focusable {
     public static get styles(): CSSResultArray {
         return [styles];
     }
+
+    @property()
+    channel: ColorChannel = 'hue';
 
     @property({ type: Boolean, reflect: true })
     public disabled = false;
@@ -63,17 +76,43 @@ export class ColorSlider extends Focusable {
     }
 
     public set value(hue: number) {
-        const value = Math.min(360, Math.max(0, hue));
+        let value = hue;
+        if (this.channel === 'hue') {
+            value = Math.min(360, Math.max(0, hue));
+        } else {
+            value = Math.min(255, Math.max(0, hue));
+        }
         if (value === this.value) {
             return;
         }
         const oldValue = this.value;
-        const { s, v } = this._color.toHsv();
-        this._color = new TinyColor({ h: value, s, v });
+        const channels: Record<string, () => void> = {
+            hue: () => {
+                const { s, v } = this._color.toHsv();
+                this._color = new TinyColor({ h: value, s, v });
+            },
+            red: () => {
+                const { g, b } = this._color.toRgb();
+                this._color = new TinyColor({ r: value, g, b });
+            },
+            green: () => {
+                const { r, b } = this._color.toRgb();
+                this._color = new TinyColor({ r, g: value, b });
+            },
+            blue: () => {
+                const { r, g } = this._color.toRgb();
+                this._color = new TinyColor({ r, g, b: value });
+            },
+        };
+        channels[this.channel]();
         this._value = value;
 
         if (value !== this.sliderHandlePosition) {
-            this.sliderHandlePosition = 100 * (value / 360);
+            if (this.channel === 'hue') {
+                this.sliderHandlePosition = 100 * (value / 360);
+            } else {
+                this.sliderHandlePosition = 100 * (value / 255);
+            }
         }
 
         this.requestUpdate('value', oldValue);
@@ -153,21 +192,31 @@ export class ColorSlider extends Focusable {
             isString,
         };
 
-        if (isString && format.startsWith('hs')) {
-            const values = extractHueAndSaturationRegExp.exec(color as string);
-            if (values !== null) {
-                const [, h, s] = values;
-                this.value = Number(h);
-                this._saturation = Number(s);
+        if (this.channel === 'hue') {
+            if (isString && format.startsWith('hs')) {
+                const values = extractHueAndSaturationRegExp.exec(
+                    color as string
+                );
+                if (values !== null) {
+                    const [, h, s] = values;
+                    this.value = Number(h);
+                    this._saturation = Number(s);
+                }
+            } else if (!isString && format.startsWith('hs')) {
+                const colorInput = this._color.originalInput;
+                const colorValues = Object.values(colorInput);
+                this.value = colorValues[0];
+                this._saturation = colorValues[1];
+            } else {
+                const { h } = this._color.toHsv();
+                this.value = h;
             }
-        } else if (!isString && format.startsWith('hs')) {
-            const colorInput = this._color.originalInput;
-            const colorValues = Object.values(colorInput);
-            this.value = colorValues[0];
-            this._saturation = colorValues[1];
-        } else {
-            const { h } = this._color.toHsv();
-            this.value = h;
+        } else if (this.channel === 'red') {
+            this.value = this._color.toRgb().r;
+        } else if (this.channel === 'green') {
+            this.value = this._color.toRgb().g;
+        } else if (this.channel === 'blue') {
+            this.value = this._color.toRgb().b;
         }
         this._previousColor = oldValue;
         this.requestUpdate('color', oldValue);
@@ -234,8 +283,19 @@ export class ColorSlider extends Focusable {
             100,
             Math.max(0, this.sliderHandlePosition + delta)
         );
-        this.value = 360 * (this.sliderHandlePosition / 100);
-        this._color = new TinyColor({ ...this._color.toHsl(), h: this.value });
+        if (this.channel === 'hue') {
+            this.value = 360 * (this.sliderHandlePosition / 100);
+            this._color = new TinyColor({
+                ...this._color.toHsl(),
+                h: this.value,
+            });
+        } else {
+            this.value = 255 * (this.sliderHandlePosition / 100);
+            this._color = new TinyColor({
+                ...this._color.toHsl(),
+                h: this.value,
+            });
+        }
 
         if (delta != 0) {
             this.dispatchEvent(
@@ -257,7 +317,12 @@ export class ColorSlider extends Focusable {
         const { valueAsNumber } = event.target;
 
         this.value = valueAsNumber;
-        this.sliderHandlePosition = 100 * (this.value / 360);
+        if (this.channel === 'hue') {
+            this.sliderHandlePosition = 100 * (this.value / 360);
+        } else {
+            this.sliderHandlePosition = 100 * (this.value / 255);
+        }
+        // if (this.channel == '')
         this._color = new TinyColor({ ...this._color.toHsl(), h: this.value });
     }
 
@@ -312,9 +377,38 @@ export class ColorSlider extends Focusable {
 
     private handlePointermove(event: PointerEvent): void {
         this.sliderHandlePosition = this.calculateHandlePosition(event);
-        this.value = 360 * (this.sliderHandlePosition / 100);
-
-        this._color = new TinyColor({ ...this._color.toHsl(), h: this.value });
+        if (this.channel === 'hue') {
+            this.value = 360 * (this.sliderHandlePosition / 100);
+        } else {
+            this.value = 255 * (this.sliderHandlePosition / 100);
+        }
+        const channels: Record<string, () => void> = {
+            hue: () => {
+                this._color = new TinyColor({
+                    ...this._color.toHsl(),
+                    h: this.value,
+                });
+            },
+            red: () => {
+                this._color = new TinyColor({
+                    ...this._color.toRgb(),
+                    r: this.value,
+                });
+            },
+            green: () => {
+                this._color = new TinyColor({
+                    ...this._color.toRgb(),
+                    g: this.value,
+                });
+            },
+            blue: () => {
+                this._color = new TinyColor({
+                    ...this._color.toRgb(),
+                    b: this.value,
+                });
+            },
+        };
+        channels[this.channel]();
 
         this.dispatchEvent(
             new Event('input', {
@@ -383,7 +477,30 @@ export class ColorSlider extends Focusable {
         }%`;
     }
 
+    protected get handleColor(): ColorValue | string {
+        const color = this._color.toRgb();
+        const colors: Record<string, string> = {
+            hue: `hsl(${this.value}, 100%, 50%)`,
+            red: `rgb(${this.value}, ${color.g}, ${color.b})`,
+            green: `rgb(${color.r}, ${this.value}, ${color.b})`,
+            blue: `rgb(${color.r}, ${color.g}, ${this.value})`,
+        };
+
+        return colors[this.channel] || colors.hue;
+    }
+
+    protected get sliderMax(): number {
+        const channels: Record<string, number> = {
+            hue: 360,
+            red: 255,
+            green: 255,
+            blue: 255,
+        };
+        return channels[this.channel] || channels['hue'];
+    }
+
     protected render(): TemplateResult {
+        const color = this._color.toRgb();
         return html`
             <div
                 class="checkerboard"
@@ -393,9 +510,14 @@ export class ColorSlider extends Focusable {
                 <div
                     class="gradient"
                     role="presentation"
-                    style="background: linear-gradient(to ${this.vertical
+                    style="
+                        --sp-color-slider-red: ${color.r};
+                        --sp-color-slider-green: ${color.g};
+                        --sp-color-slider-blue: ${color.b};
+                        background: linear-gradient(to ${this.vertical
                         ? 'bottom'
-                        : 'right'}, var(--sp-color-slider-gradient, var(--sp-color-slider-gradient-fallback)));"
+                        : 'right'}, var(--sp-color-slider-gradient, var(--sp-color-slider-gradient-fallback)));
+                    "
                 >
                     <slot name="gradient"></slot>
                 </div>
@@ -405,7 +527,7 @@ export class ColorSlider extends Focusable {
                 @focus=${this.forwardFocus}
                 ?focused=${this.focused}
                 class="handle"
-                color="hsl(${this.value}, 100%, 50%)"
+                color=${this.handleColor}
                 ?disabled=${this.disabled}
                 style=${this.handlePositionStyles}
                 ${streamingListener({
@@ -418,7 +540,7 @@ export class ColorSlider extends Focusable {
                 type="range"
                 class="slider"
                 min="0"
-                max="360"
+                max=${this.sliderMax}
                 step=${this.step}
                 aria-label=${this.label}
                 .value=${String(this.value)}

@@ -13,10 +13,6 @@ governing permissions and limitations under the License.
 @import './spectrum-color-slider.css';
 
 :host {
-    --sp-color-slider-gradient-fallback: rgb(255 0 0) 0%, rgb(255 255 0) 17%,
-        rgb(0 255 0) 33%, rgb(0 255 255) 50%, rgb(0 0 255) 67%,
-        rgb(255 0 255) 83%, rgb(255 0 0) 100%;
-
     touch-action: none;
 }
 
@@ -34,9 +30,37 @@ governing permissions and limitations under the License.
 
 .gradient {
     overflow: hidden;
+
+    --sp-color-slider-gradient-fallback: rgb(255 0 0) 0%, rgb(255 255 0) 17%,
+        rgb(0 255 0) 33%, rgb(0 255 255) 50%, rgb(0 0 255) 67%,
+        rgb(255 0 255) 83%, rgb(255 0 0) 100%;
 }
 
 ::slotted(*) {
     width: 100%;
     height: 100%;
+}
+
+:host([channel='red']) .gradient {
+    --sp-color-slider-gradient-fallback: rgb(
+                0 var(--sp-color-slider-green) var(--sp-color-slider-blue)
+            )
+            0%,
+        rgb(255 var(--sp-color-slider-green) var(--sp-color-slider-blue)) 100%;
+}
+
+:host([channel='green']) .gradient {
+    --sp-color-slider-gradient-fallback: rgb(
+                var(--sp-color-slider-red) 0 var(--sp-color-slider-blue)
+            )
+            0%,
+        rgb(var(--sp-color-slider-red) 255 var(--sp-color-slider-blue)) 100%;
+}
+
+:host([channel='blue']) .gradient {
+    --sp-color-slider-gradient-fallback: rgb(
+                var(--sp-color-slider-red) var(--sp-color-slider-green) 0
+            )
+            0%,
+        rgb(var(--sp-color-slider-red) var(--sp-color-slider-green) 255) 100%;
 }
