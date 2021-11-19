@@ -12,3 +12,22 @@ governing permissions and limitations under the License.
 
 import '@spectrum-web-components/theme/theme-lightest.js';
 import '@spectrum-web-components/theme/scale-medium.js';
+import '@spectrum-web-components/thumbnail/sp-thumbnail.js';
+import type { Thumbnail } from '@spectrum-web-components/thumbnail';
+
+document
+    .querySelector('.css-custom-property-listing')
+    ?.addEventListener('click', (event: Event) => {
+        if ((event.target as HTMLElement).classList?.contains('sample')) {
+            (event.target as HTMLElement).dispatchEvent(
+                new CustomEvent('copy-text', {
+                    bubbles: true,
+                    composed: true,
+                    detail: {
+                        text: (event.target as Thumbnail).background,
+                        message: 'CSS Custom Property copied to clipboard!',
+                    },
+                })
+            );
+        }
+    });

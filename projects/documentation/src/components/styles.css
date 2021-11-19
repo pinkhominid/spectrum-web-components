@@ -717,3 +717,12 @@ icons-demo::part(icon) {
     padding: calc(0.5 * var(--spectrum-global-dimension-static-size-200)) 0;
     gap: var(--spectrum-global-dimension-static-size-200);
 }
+
+.css-custom-property-listing sp-thumbnail {
+    transition: transform 0.3s ease-in-out;
+}
+
+.css-custom-property-listing sp-thumbnail:hover,
+.css-custom-property-listing sp-thumbnail:focus-visible {
+    transform: scale(1.5);
+}
