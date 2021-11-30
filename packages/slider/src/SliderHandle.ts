@@ -88,8 +88,12 @@ export class SliderHandle extends Focusable {
 
     _forcedUnit = '';
 
+    /**
+     * By default, the value of a Slider Handle will be halfway between its
+     * `min` and `max` values, or the `min` value when `max` is less than `min`.
+     */
     @property({ type: Number })
-    value = 10;
+    value!: number;
 
     @property({ type: Boolean, reflect: true })
     public dragging = false;
@@ -134,6 +138,17 @@ export class SliderHandle extends Focusable {
         super.update(changes);
     }
 
+    protected firstUpdated(changedProperties: PropertyValues<this>): void {
+        super.firstUpdated(changedProperties);
+        this.dispatchEvent(new CustomEvent('sp-slider-handle-ready'));
+        const { max, min } = this as { max: number; min: number };
+        if (this.value == null) {
+            if (!isNaN(max) && !isNaN(min)) {
+                this.value = max < min ? min : min + (max - min) / 2;
+            }
+        }
+    }
+
     protected updated(changedProperties: PropertyValues<this>): void {
         if (changedProperties.has('value')) {
             const oldValue = changedProperties.get('value');
@@ -144,11 +159,6 @@ export class SliderHandle extends Focusable {
         }
         this.handleController?.handleHasChanged(this);
         super.updated(changedProperties);
-    }
-
-    protected firstUpdated(changedProperties: PropertyValues<this>): void {
-        super.firstUpdated(changedProperties);
-        this.dispatchEvent(new CustomEvent('sp-slider-handle-ready'));
     }
 
     @property({ attribute: false })
