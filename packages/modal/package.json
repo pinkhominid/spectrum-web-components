@@ -43,6 +43,8 @@
     ],
     "dependencies": {
         "@spectrum-web-components/base": "^0.5.1",
+        "@spectrum-web-components/overlay": "^0.14.0",
+        "@spectrum-web-components/reactive-controllers": "^0.2.0",
         "tslib": "^2.0.0"
     },
     "devDependencies": {

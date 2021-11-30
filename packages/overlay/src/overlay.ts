@@ -17,6 +17,7 @@ import {
     TriggerInteractions,
 } from './overlay-types';
 import { OverlayStack } from './overlay-stack.js';
+import '../overlay-proxy.js';
 
 /**
  * This class allows access to the overlay system which allows a client to
