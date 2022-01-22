@@ -10,8 +10,6 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-import 'focus-visible';
-
 declare global {
     interface Window {
         applyFocusVisiblePolyfill?: (scope: Document | ShadowRoot) => void;
@@ -34,14 +32,15 @@ type MixableBaseClass = HTMLElement & OptionalLifecycleCallbacks;
 
 type EndPolyfillCoordinationCallback = () => void;
 
-import 'focus-visible';
-
 let hasFocusVisible = true;
 
 try {
     document.body.querySelector(':focus-visible');
 } catch (error) {
     hasFocusVisible = false;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    import('focus-visible');
 }
 
 /**
@@ -121,7 +120,8 @@ export const FocusVisiblePolyfillMixin = <
     // syntax The mixin implementation assumes that the user will take the
     // appropriate steps to support both:
     class FocusVisibleCoordinator extends SuperClass {
-        private [$endPolyfillCoordination]: EndPolyfillCoordinationCallback | null = null;
+        private [$endPolyfillCoordination]: EndPolyfillCoordinationCallback | null =
+            null;
 
         // Attempt to coordinate with the polyfill when connected to the
         // document:
@@ -130,9 +130,8 @@ export const FocusVisiblePolyfillMixin = <
             if (!hasFocusVisible) {
                 requestAnimationFrame(() => {
                     if (this[$endPolyfillCoordination] == null) {
-                        this[$endPolyfillCoordination] = coordinateWithPolyfill(
-                            this
-                        );
+                        this[$endPolyfillCoordination] =
+                            coordinateWithPolyfill(this);
                     }
                 });
             }
