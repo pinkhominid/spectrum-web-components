@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
 Copyright 2020 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -12,16 +10,18 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-import chokidar from 'chokidar';
-import debounce from 'debounce';
-import { processCSS } from './build-css.js';
+import { elementUpdated, expect, fixture } from '@open-wc/testing';
 
-const debounceProcessCSS = debounce.debounce(processCSS, 200);
+import '../sp-grid.js';
+import { Grid } from '..';
+import { Default } from '../stories/grid.stories.js';
 
-// One-liner for current directory
-chokidar
-    .watch(['./packages/*/src/*.css', './tools/*/src/*.css'])
-    .on('change', debounceProcessCSS)
-    .on('add', debounceProcessCSS);
+describe('Grid', () => {
+    it('loads default grid accessibly', async () => {
+        const el = await fixture<Grid>(Default());
 
-console.log('Listening to CSS...');
+        await elementUpdated(el);
+
+        await expect(el).to.be.accessible();
+    });
+});
