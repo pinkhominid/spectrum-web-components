@@ -1187,6 +1187,8 @@ describe('Picker, sync', () => {
         const menu = document.querySelector('sp-menu') as Menu;
         await elementUpdated(menu);
 
+        await waitUntil(() => menu.hasAttribute('aria-activedescendant'));
+
         expect(firstItem.focused, 'firstItem NOT "focused"').to.be.false;
         expect(secondItem.focused, 'secondItem "focused"').to.be.true;
         expect(menu.getAttribute('aria-activedescendant')).to.equal(
